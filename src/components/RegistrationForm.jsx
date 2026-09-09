@@ -221,7 +221,7 @@ export default function RegistrationForm({ onSuccess }) {
       {/* ── 7. WhatsApp Community Concern ── */}
       <div className={`form-q-card ${errors.whatsappCommunityConcern ? 'has-error' : ''}`}>
         <label className="q-label">
-          WhatsApp community issue? / വാട്സ്ആപ്പ് കമ്മ്യൂണിറ്റിയിൽ ചേർക്കുന്നതിൽ പ്രശ്നമുണ്ടോ?
+          WhatsApp community issue? / സ്ഥാപനത്തിൻ്റെ വാട്സ്ആപ്പ് കമ്മ്യൂണിറ്റിയിൽ ചേർക്കുന്നതിൽ വിരോധമുണ്ടോ?
           <span className="req-star"> *</span>
         </label>
         <div className="q-radio-group">
@@ -271,7 +271,7 @@ export default function RegistrationForm({ onSuccess }) {
       </div>
 
       <p className="form-disclaimer">
-        This content is created for <strong>ഇശ്ഖ് മജ്‌ലിസ് 2026</strong> — M.I.C. Udyama Padinjaru Campus.<br />
+        This content is created for <strong>ഇശ്ഖ് മജ്‌ലിസ് 2026</strong> — M.I.C. Udma West Campus.<br />
         For inquiries call: <a href="tel:7593839179">7593839179</a>
       </p>
     </form>
