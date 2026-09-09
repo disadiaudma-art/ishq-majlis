@@ -8,6 +8,8 @@ export default function RegistrationForm({ onSuccess }) {
     age: '',
     gender: '',
     attendeesCount: '',
+    whatsappNumber: '',
+    whatsappCommunityConcern: '',
   })
   const [errors, setErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
@@ -20,7 +22,7 @@ export default function RegistrationForm({ onSuccess }) {
 
   function handleClear() {
     if (window.confirm('Clear form? All entered answers will be removed.')) {
-      setFormData({ fullName: '', place: '', age: '', gender: '', attendeesCount: '' })
+      setFormData({ fullName: '', place: '', age: '', gender: '', attendeesCount: '', whatsappNumber: '', whatsappCommunityConcern: '' })
       setErrors({})
       setServerError('')
     }
@@ -33,6 +35,9 @@ export default function RegistrationForm({ onSuccess }) {
     if (!formData.age || isNaN(formData.age) || Number(formData.age) < 1 || Number(formData.age) > 120) errs.age = 'Enter a valid age'
     if (!formData.gender) errs.gender = 'This is a required question'
     if (!formData.attendeesCount || isNaN(formData.attendeesCount) || Number(formData.attendeesCount) < 1) errs.attendeesCount = 'Minimum 1 attendee required'
+    if (!formData.whatsappNumber.trim()) errs.whatsappNumber = 'WhatsApp number is required'
+    else if (!/^\+?[0-9\s()-]{10,20}$/.test(formData.whatsappNumber.trim())) errs.whatsappNumber = 'Enter a valid WhatsApp number'
+    if (!formData.whatsappCommunityConcern) errs.whatsappCommunityConcern = 'Please select Yes or No'
     setErrors(errs)
     return Object.keys(errs).length === 0
   }
@@ -50,6 +55,8 @@ export default function RegistrationForm({ onSuccess }) {
         age: parseInt(formData.age, 10),
         gender: formData.gender,
         attendeesCount: parseInt(formData.attendeesCount, 10),
+        whatsappNumber: formData.whatsappNumber.trim(),
+        whatsappCommunityConcern: formData.whatsappCommunityConcern.trim(),
       }
       const res = await submitRegistration(payload)
       if (res.data?.success && res.data?.data) {
@@ -185,6 +192,59 @@ export default function RegistrationForm({ onSuccess }) {
           <div className="q-error">
             <i className="fa-solid fa-circle-exclamation" />
             <span>{errors.attendeesCount}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── 6. WhatsApp Number ── */}
+      <div className={`form-q-card ${errors.whatsappNumber ? 'has-error' : ''}`}>
+        <label className="q-label">
+          WhatsApp Number / വാട്സ്ആപ്പ് നമ്പർ
+          <span className="req-star"> *</span>
+        </label>
+        <input
+          type="tel"
+          name="whatsappNumber"
+          className="q-input"
+          placeholder="Your WhatsApp number"
+          value={formData.whatsappNumber}
+          onChange={e => handleChange('whatsappNumber', e.target.value)}
+        />
+        {errors.whatsappNumber && (
+          <div className="q-error">
+            <i className="fa-solid fa-circle-exclamation" />
+            <span>{errors.whatsappNumber}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── 7. WhatsApp Community Concern ── */}
+      <div className={`form-q-card ${errors.whatsappCommunityConcern ? 'has-error' : ''}`}>
+        <label className="q-label">
+          WhatsApp community issue? / വാട്സ്ആപ്പ് കമ്മ്യൂണിറ്റിയിൽ ചേർക്കുന്നതിൽ പ്രശ്നമുണ്ടോ?
+          <span className="req-star"> *</span>
+        </label>
+        <div className="q-radio-group">
+          {['Yes', 'No'].map(opt => (
+            <label
+              key={opt}
+              className={`q-radio-label ${formData.whatsappCommunityConcern === opt ? 'is-selected' : ''}`}
+            >
+              <input
+                type="radio"
+                name="whatsappCommunityConcern"
+                value={opt}
+                checked={formData.whatsappCommunityConcern === opt}
+                onChange={() => handleChange('whatsappCommunityConcern', opt)}
+              />
+              <span className="q-radio-text">{opt === 'Yes' ? 'Yes / അതെ' : 'No / ഇല്ല'}</span>
+            </label>
+          ))}
+        </div>
+        {errors.whatsappCommunityConcern && (
+          <div className="q-error">
+            <i className="fa-solid fa-circle-exclamation" />
+            <span>{errors.whatsappCommunityConcern}</span>
           </div>
         )}
       </div>

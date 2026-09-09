@@ -51,7 +51,7 @@ export default function AdminDashboard() {
 
   function exportCSV() {
     if (!registrations.length) { alert('No registrations to export'); return }
-    const headers = ['Registration ID', 'Full Name', 'Place', 'Age', 'Gender', 'Attendees Count', 'Registered At']
+    const headers = ['Registration ID', 'Full Name', 'Place', 'Age', 'Gender', 'Attendees Count', 'WhatsApp Number', 'Community Concern', 'Registered At']
     const rows = registrations.map(r => [
       `"${r.registrationId || ''}"`,
       `"${r.fullName || ''}"`,
@@ -59,6 +59,8 @@ export default function AdminDashboard() {
       r.age || '',
       `"${r.gender || ''}"`,
       r.attendeesCount || 1,
+      `"${r.whatsappNumber || ''}"`,
+      `"${r.whatsappCommunityConcern || ''}"`,
       `"${new Date(r.createdAt).toLocaleString('en-IN')}"`,
     ])
     const csv = 'data:text/csv;charset=utf-8,\uFEFF' +
@@ -270,6 +272,8 @@ export default function AdminDashboard() {
                     <th>Age</th>
                     <th>Gender</th>
                     <th>Attendees</th>
+                    <th>WhatsApp</th>
+                    <th>Community Concern</th>
                     <th>Registered At</th>
                     <th>Actions</th>
                   </tr>
@@ -292,6 +296,8 @@ export default function AdminDashboard() {
                           {item.attendeesCount}
                         </span>
                       </td>
+                      <td>{item.whatsappNumber || item.whatsappNo || item.whatsapp || '—'}</td>
+                      <td>{item.whatsappCommunityConcern || item.communityConcern || 'No'}</td>
                       <td className="cell-date">
                         {new Date(item.createdAt).toLocaleDateString('en-IN', {
                           day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit',
@@ -378,6 +384,18 @@ export default function AdminDashboard() {
                         <i className="fa-solid fa-check" />
                         {item.attendeesCount} {item.attendeesCount > 1 ? 'പേർ' : 'ആൾ'}
                       </span>
+                    </div>
+                    <div className="rmc-item">
+                      <span className="rmc-label">
+                        <i className="fa-brands fa-whatsapp" /> WhatsApp
+                      </span>
+                      <span className="rmc-val">{item.whatsappNumber || item.whatsappNo || item.whatsapp || '—'}</span>
+                    </div>
+                    <div className="rmc-item">
+                      <span className="rmc-label">
+                        <i className="fa-solid fa-circle-question" /> Community issue
+                      </span>
+                      <span className="rmc-val">{item.whatsappCommunityConcern || item.communityConcern || 'No'}</span>
                     </div>
                     <div className="rmc-item rmc-full">
                       <span className="rmc-label">

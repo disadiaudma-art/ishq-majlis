@@ -1,7 +1,11 @@
 import axios from 'axios'
 
-// Set full Render URL as fallback to avoid relative path 404s on Vercel
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://ishq-majlis-server.onrender.com/api'
+// Use the local Mongo-backed API during development; deployed builds use Render.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || (
+  import.meta.env.DEV
+    ? 'http://localhost:5001/api'
+    : 'https://ishq-majlis-server.onrender.com/api'
+)
 
 const api = axios.create({
   baseURL: BASE_URL,
