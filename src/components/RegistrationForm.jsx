@@ -173,28 +173,7 @@ export default function RegistrationForm({ onSuccess }) {
         )}
       </div>
 
-      {/* ── 5. Number of Attendees ── */}
-      <div className={`form-q-card ${errors.attendeesCount ? 'has-error' : ''}`}>
-        <label className="q-label">
-          Number of Attendees / പങ്കെടുക്കുന്നവരുടെ എണ്ണം
-          <span className="req-star"> *</span>
-        </label>
-        <input
-          type="number"
-          min="1"
-          max="100"
-          className="q-input"
-          placeholder="Your answer"
-          value={formData.attendeesCount}
-          onChange={e => handleChange('attendeesCount', e.target.value)}
-        />
-        {errors.attendeesCount && (
-          <div className="q-error">
-            <i className="fa-solid fa-circle-exclamation" />
-            <span>{errors.attendeesCount}</span>
-          </div>
-        )}
-      </div>
+      
 
       {/* ── 6. WhatsApp Number ── */}
       <div className={`form-q-card ${errors.whatsappNumber ? 'has-error' : ''}`}>
