@@ -5,9 +5,9 @@ export default function RegistrationForm({ onSuccess }) {
   const [formData, setFormData] = useState({
     fullName: '',
     place: '',
-    age: '',
-    gender: '',
+    hasAboveThreeYears: '',
     attendeesCount: '',
+    gender: '',
     whatsappNumber: '',
     whatsappCommunityConcern: '',
   })
@@ -22,7 +22,15 @@ export default function RegistrationForm({ onSuccess }) {
 
   function handleClear() {
     if (window.confirm('Clear form? All entered answers will be removed.')) {
-      setFormData({ fullName: '', place: '', age: '', gender: '', attendeesCount: '', whatsappNumber: '', whatsappCommunityConcern: '' })
+      setFormData({
+        fullName: '',
+        place: '',
+        hasAboveThreeYears: '',
+        attendeesCount: '',
+        gender: '',
+        whatsappNumber: '',
+        whatsappCommunityConcern: '',
+      })
       setErrors({})
       setServerError('')
     }
@@ -32,9 +40,14 @@ export default function RegistrationForm({ onSuccess }) {
     const errs = {}
     if (!formData.fullName.trim()) errs.fullName = 'This is a required question'
     if (!formData.place.trim()) errs.place = 'This is a required question'
-    if (!formData.age || isNaN(formData.age) || Number(formData.age) < 1 || Number(formData.age) > 120) errs.age = 'Enter a valid age'
+    if (!formData.hasAboveThreeYears) {
+      errs.hasAboveThreeYears = 'Please select Yes or No / അതെ അല്ലെങ്കിൽ ഇല്ല തിരഞ്ഞെടുക്കുക'
+    } else if (formData.hasAboveThreeYears === 'Yes') {
+      if (!formData.attendeesCount || isNaN(formData.attendeesCount) || Number(formData.attendeesCount) < 1) {
+        errs.attendeesCount = 'Enter valid number of attendees (minimum 1) / പങ്കെടുക്കുന്നവരുടെ എണ്ണം രേഖപ്പെടുത്തുക'
+      }
+    }
     if (!formData.gender) errs.gender = 'This is a required question'
-    if (!formData.attendeesCount || isNaN(formData.attendeesCount) || Number(formData.attendeesCount) < 1) errs.attendeesCount = 'Minimum 1 attendee required'
     if (!formData.whatsappNumber.trim()) errs.whatsappNumber = 'WhatsApp number is required'
     else if (!/^\+?[0-9\s()-]{10,20}$/.test(formData.whatsappNumber.trim())) errs.whatsappNumber = 'Enter a valid WhatsApp number'
     if (!formData.whatsappCommunityConcern) errs.whatsappCommunityConcern = 'Please select Yes or No'
@@ -48,16 +61,18 @@ export default function RegistrationForm({ onSuccess }) {
     if (!validate()) return
 
     setSubmitting(true)
+    const count = formData.hasAboveThreeYears === 'Yes' ? parseInt(formData.attendeesCount, 10) : 1
+    const payload = {
+      fullName: formData.fullName.trim(),
+      place: formData.place.trim(),
+      hasAboveThreeYears: formData.hasAboveThreeYears,
+      gender: formData.gender,
+      attendeesCount: count,
+      whatsappNumber: formData.whatsappNumber.trim(),
+      whatsappCommunityConcern: formData.whatsappCommunityConcern.trim(),
+    }
+
     try {
-      const payload = {
-        fullName: formData.fullName.trim(),
-        place: formData.place.trim(),
-        age: parseInt(formData.age, 10),
-        gender: formData.gender,
-        attendeesCount: parseInt(formData.attendeesCount, 10),
-        whatsappNumber: formData.whatsappNumber.trim(),
-        whatsappCommunityConcern: formData.whatsappCommunityConcern.trim(),
-      }
       const res = await submitRegistration(payload)
       if (res.data?.success && res.data?.data) {
         onSuccess(res.data.data)
@@ -65,6 +80,22 @@ export default function RegistrationForm({ onSuccess }) {
         setServerError('Submission failed. Please try again.')
       }
     } catch (err) {
+      // Compatibility fallback if legacy backend strictly validates age
+      if (err.response?.status === 422 && JSON.stringify(err.response?.data).includes('Age')) {
+        try {
+          const fallbackPayload = {
+            ...payload,
+            age: formData.hasAboveThreeYears === 'Yes' ? 18 : 3,
+          }
+          const retryRes = await submitRegistration(fallbackPayload)
+          if (retryRes.data?.success && retryRes.data?.data) {
+            onSuccess(retryRes.data.data)
+            return
+          }
+        } catch (retryErr) {
+          console.error('Fallback submit error:', retryErr)
+        }
+      }
       const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Server error. Please try again.'
       setServerError(msg)
     } finally {
@@ -117,25 +148,67 @@ export default function RegistrationForm({ onSuccess }) {
         )}
       </div>
 
-      {/* ── 3. Age ── */}
-      <div className={`form-q-card ${errors.age ? 'has-error' : ''}`}>
+      {/* ── 3. Anyone Above 3 Years? ── */}
+      <div className={`form-q-card ${errors.hasAboveThreeYears || errors.attendeesCount ? 'has-error' : ''}`}>
         <label className="q-label">
-          Age / വയസ്സ്
+          Is there anyone above 3 years? / 3 വയസ്സിന് മുകളിൽ ആരെങ്കിലും കൂടെ വരുന്നുണ്ടോ?
           <span className="req-star"> *</span>
         </label>
-        <input
-          type="number"
-          min="1"
-          max="120"
-          className="q-input"
-          placeholder="Your answer"
-          value={formData.age}
-          onChange={e => handleChange('age', e.target.value)}
-        />
-        {errors.age && (
+        <div className="q-radio-group">
+          {['Yes', 'No'].map(opt => (
+            <label
+              key={opt}
+              className={`q-radio-label ${formData.hasAboveThreeYears === opt ? 'is-selected' : ''}`}
+            >
+              <input
+                type="radio"
+                name="hasAboveThreeYears"
+                value={opt}
+                checked={formData.hasAboveThreeYears === opt}
+                onChange={() => {
+                  handleChange('hasAboveThreeYears', opt)
+                  if (opt === 'No') {
+                    handleChange('attendeesCount', '1')
+                  }
+                }}
+              />
+              <span className="q-radio-text">
+                {opt === 'Yes' ? 'Yes / അതെ' : 'No / ഇല്ല'}
+              </span>
+            </label>
+          ))}
+        </div>
+        {errors.hasAboveThreeYears && (
           <div className="q-error">
             <i className="fa-solid fa-circle-exclamation" />
-            <span>{errors.age}</span>
+            <span>{errors.hasAboveThreeYears}</span>
+          </div>
+        )}
+
+        {/* If Yes: How many attendees */}
+        {formData.hasAboveThreeYears === 'Yes' && (
+          <div className="conditional-sub-field">
+            <label className="sub-q-label">
+              <i className="fa-solid fa-users" style={{ marginRight: 8, color: 'var(--green)' }} />
+              How many attendees? / എത്ര പേർ? (പങ്കെടുക്കുന്നവരുടെ എണ്ണം)
+              <span className="req-star"> *</span>
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="100"
+              className="q-input"
+              placeholder="e.g. 2 / എത്ര പേർ"
+              value={formData.attendeesCount}
+              onChange={e => handleChange('attendeesCount', e.target.value)}
+              autoFocus
+            />
+            {errors.attendeesCount && (
+              <div className="q-error">
+                <i className="fa-solid fa-circle-exclamation" />
+                <span>{errors.attendeesCount}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
