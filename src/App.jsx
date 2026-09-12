@@ -51,7 +51,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<RegistrationPage />} />
         <Route path="/admin" element={<AdminPage />} />
-        <Route path="/go-to/admin" element={<AdminPage />} />
+        <Route path="/go-to/admin/access" element={<AdminPage />} />
       </Routes>
     </HashRouter>
   )
