@@ -107,7 +107,7 @@ export default function PassCard({ data, showActions = true, onRegisterAnother }
 
       drawField('Full Name / പേര്', fullName, detailsY)
       drawField('Place / സ്ഥലം', place, detailsY + 80)
-      drawField('Age & Gender', `${age ? age + ' Yrs  •  ' : ''}${gender === 'Male' ? 'Male (പുരുഷൻ)' : 'Female (സ്ത്രീ)'}`, detailsY + 160)
+      drawField(age ? 'Age & Gender' : 'Gender / ലിംഗഭേദം', `${age ? age + ' Yrs  •  ' : ''}${gender === 'Male' ? 'Male (പുരുഷൻ)' : 'Female (സ്ത്രീ)'}`, detailsY + 160)
 
       // Attendees — highlighted in green
       ctx.fillStyle = '#8ea898'
@@ -204,7 +204,7 @@ export default function PassCard({ data, showActions = true, onRegisterAnother }
               <span className="pass-field-value">{place}</span>
             </div>
             <div className="pass-field">
-              <span className="pass-field-label">Age &amp; Gender</span>
+              <span className="pass-field-label">{age ? 'Age & Gender' : 'Gender / ലിംഗഭേദം'}</span>
               <span className="pass-field-value">
                 {age ? `${age} Yrs  •  ` : ''}
                 {gender === 'Male' ? 'Male (പുരുഷൻ)' : 'Female (സ്ത്രീ)'}

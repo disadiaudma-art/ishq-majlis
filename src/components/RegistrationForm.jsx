@@ -80,22 +80,6 @@ export default function RegistrationForm({ onSuccess }) {
         setServerError('Submission failed. Please try again.')
       }
     } catch (err) {
-      // Compatibility fallback if legacy backend strictly validates age
-      if (err.response?.status === 422 && JSON.stringify(err.response?.data).includes('Age')) {
-        try {
-          const fallbackPayload = {
-            ...payload,
-            age: formData.hasAboveThreeYears === 'Yes' ? 18 : 3,
-          }
-          const retryRes = await submitRegistration(fallbackPayload)
-          if (retryRes.data?.success && retryRes.data?.data) {
-            onSuccess(retryRes.data.data)
-            return
-          }
-        } catch (retryErr) {
-          console.error('Fallback submit error:', retryErr)
-        }
-      }
       const msg = err.response?.data?.errors?.[0]?.msg || err.response?.data?.message || 'Server error. Please try again.'
       setServerError(msg)
     } finally {
