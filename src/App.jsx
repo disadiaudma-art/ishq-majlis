@@ -45,7 +45,7 @@ function AdminPage() {
   )
 }
 
-export default function App() {
+ {
   return (
     <HashRouter>
       <Routes>
